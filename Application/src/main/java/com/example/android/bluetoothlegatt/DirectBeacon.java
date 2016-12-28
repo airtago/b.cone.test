@@ -71,9 +71,10 @@ public class DirectBeacon {
         }
 
         if ( DetectParams.DEV_MODE ) {
-            return String.format("[ %d ] : %.1f %.1f  diff: %.1f", id1, avg_rss[0], avg_rss[1], avg_diff);
+            return String.format("[ %07X ] : %.1f %.1f  diff: %.1f", id1, avg_rss[0], avg_rss[1], avg_diff);
         } else {
-            return String.format("b.cone id[ %d ]", id1 );
+            return String.format("b.cone id[ %07" +
+                    "X ]", id1 );
         }
     }
 

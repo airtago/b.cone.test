@@ -28,6 +28,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.ParcelUuid;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -42,11 +44,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
 public class DeviceScanActivity extends ListActivity {
+    final static String TAG = "SCANNER";
+
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
@@ -226,6 +231,16 @@ public class DeviceScanActivity extends ListActivity {
             beaconsHolder.addInfo( device.getAddress(), rssi );
         }
 
+        public void addDevice( BluetoothDevice device, int rssi, byte[] scanRecord) {
+            int uuid = scanRecord[9]*65536 + scanRecord[23]*256 + scanRecord[24];
+            byte major = scanRecord[26];
+            byte minor = scanRecord[28];
+
+            //Log.d(TAG, String.format("0x%08X %d %d", uuid, major, minor));
+
+            beaconsHolder.addInfo( uuid, major, rssi );
+        }
+
         public void clear() {
             beaconsHolder.clear();
         }
@@ -285,10 +300,11 @@ public class DeviceScanActivity extends ListActivity {
         @Override
         public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
             final int rssi_ = rssi;
+            final byte[] scanRecord_ = scanRecord;
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mLeDeviceListAdapter.addDevice(device, rssi_);
+                    mLeDeviceListAdapter.addDevice(device, rssi_, scanRecord_);
                     mLeDeviceListAdapter.notifyDataSetChanged();
                 }
             });
