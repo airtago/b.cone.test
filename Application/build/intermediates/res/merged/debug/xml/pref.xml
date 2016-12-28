@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:key="DIFF_THRESHOLD"
+        android:summary="Threshold value for visibility"
+        android:title="Diff threshold"
+        android:defaultValue="10.0">
+    </EditTextPreference>
+    <EditTextPreference
+        android:key="AVG_CNT"
+        android:summary="Times to average"
+        android:title="Averager count"
+        android:defaultValue="5">
+    </EditTextPreference>
+    <CheckBoxPreference
+        android:key="DEV_MODE"
+        android:summary="Show debug values"
+        android:title="Developer mode"
+        android:defaultValue="false">
+    </CheckBoxPreference>
+</PreferenceScreen>
