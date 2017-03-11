@@ -13,6 +13,12 @@
         android:defaultValue="5">
     </EditTextPreference>
     <CheckBoxPreference
+        android:key="INVERT_ANTS_IDXS"
+        android:summary="Use inverted antenna's 'minor' values"
+        android:title="Invert ant's indexes"
+        android:defaultValue="false">
+    </CheckBoxPreference>
+    <CheckBoxPreference
         android:key="DEV_MODE"
         android:summary="Show debug values"
         android:title="Developer mode"

@@ -68,7 +68,6 @@ public class DeviceScanActivity extends ListActivity {
     private static final int REQUEST_ENABLE_BT = 1;
     // Stops scanning after 10 minutes.
     private static final long SCAN_PERIOD = 600 * 1000;
-    private static final long SCAN_PERIOD_FAST = 250;
 
     static final int B_CONE_REQUEST_ACCESS_FINE_LOCATION = 1;
 

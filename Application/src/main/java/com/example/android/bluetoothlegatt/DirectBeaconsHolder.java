@@ -64,9 +64,19 @@ public class DirectBeaconsHolder {
                 if ( anotherId >= 0 ) {
                     Log.d(TAG, "New DIRECT BEACON");
                     unpaired.remove(anotherId);
-                    DirectBeacon beacon = new DirectBeacon( id, anotherId );
-                    beaconsMap.put(id, beacon);
-                    beaconsMap.put(anotherId, beacon);
+
+                    int id0, id1;
+                    if ( DetectParams.INVERT_ANTS_IDXS ) {
+                        id0 = Math.max(id, anotherId);
+                        id1 = Math.min(id, anotherId);
+                    } else {
+                        id0 = Math.min(id, anotherId);
+                        id1 = Math.max(id, anotherId);
+                    }
+
+                    DirectBeacon beacon = new DirectBeacon( id0, id1 );
+                    beaconsMap.put(id0, beacon);
+                    beaconsMap.put(id1, beacon);
                     beacons.add(beacon);
                 } else {
                     Log.d(TAG,"New unpaired key");
