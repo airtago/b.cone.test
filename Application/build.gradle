@@ -34,11 +34,11 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        minSdkVersion 18
+        minSdkVersion 23
         targetSdkVersion 23
 
-        versionCode 8
-        versionName "1.0.8a"
+        versionCode 9
+        versionName "1.1.0"
         archivesBaseName = "b.cone-$versionName"
     }
 
