@@ -289,14 +289,14 @@ public class DeviceScanActivity extends ListActivity {
             mInflator = DeviceScanActivity.this.getLayoutInflater();
         }
 
-        void addDevice( int rssi, byte[] scanRecord) {
+        boolean addDevice( int rssi, byte[] scanRecord) {
             int uuid = scanRecord[9]*65536 + scanRecord[23]*256 + scanRecord[24];
             byte major = scanRecord[26];
             //byte minor = scanRecord[28];
 
             //Log.d(TAG, String.format("0x%08X %d %d", uuid, major, minor));
 
-            beaconsHolder.addInfo( uuid, major, rssi );
+            return beaconsHolder.addInfo( uuid, major, rssi );
         }
 
         void clear() {
@@ -362,8 +362,9 @@ public class DeviceScanActivity extends ListActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mLeDeviceListAdapter.addDevice(rssi_, scanRecord_);
-                    mLeDeviceListAdapter.notifyDataSetChanged();
+                    if ( mLeDeviceListAdapter.addDevice(rssi_, scanRecord_) ) {
+                        mLeDeviceListAdapter.notifyDataSetChanged();
+                    }
                 }
             });
         }

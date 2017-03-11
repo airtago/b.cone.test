@@ -27,17 +27,18 @@ class DirectBeaconsHolder {
         beacons.clear();
     }
 
-    void addInfo(int short_uuid, byte major, int rssi) {
-        addInfo( short_uuid*16 + major, rssi );
+    boolean addInfo(int short_uuid, byte major, int rssi) {
+        return addInfo( short_uuid*16 + major, rssi );
     }
 
-    private void addInfo( int id, int rssi ) {
+    private boolean addInfo( int id, int rssi ) {
         //Log.d(TAG, String.format("addInfo(%d ,%d)", id, rssi));
 
         DirectBeacon beacon = beaconsMap.get(id);
         if ( beacon != null ) {
             //Log.d(TAG, "existed paired key");
             beacon.setRssi(id, rssi);
+            return true;
         } else {
             //Log.d(TAG, "new or unpaired key");
             if ( !unpaired.contains(id) ) {
@@ -79,5 +80,6 @@ class DirectBeaconsHolder {
             //}
 
         }
+        return false;
     }
 }

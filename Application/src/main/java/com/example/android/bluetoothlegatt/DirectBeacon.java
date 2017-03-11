@@ -3,30 +3,55 @@ package com.example.android.bluetoothlegatt;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.Locale;
 
-public class DirectBeacon {
+class DirectBeacon {
 
-    final static String TAG = "DBeacon";
+    private final static String TAG = "DBeacon";
 
     private int id1;
     private int id2;
 
     private double[] avg_rss = new double[2];
     private double avg_diff;
+    private boolean needRecalc = true;
 
-    ArrayList<LinkedList<Double>> rss = new ArrayList<>();
+    private int touchCount = 0;
+    private double touchRatioPS = 0.0;
+    private long firstTouchMs = 0;
+    private long TARGET_DELTA_MS = 1500;
 
-    public DirectBeacon(int id1, int id2) {
+    private ArrayList<LinkedList<Double>> rss = new ArrayList<>();
+
+    DirectBeacon(int id1, int id2) {
         this.id1 = id1;
         this.id2 = id2;
         rss.add(0, new LinkedList<Double>());
         rss.add(1, new LinkedList<Double>());
         needRecalc = true;
+        firstTouchMs = Calendar.getInstance().getTimeInMillis();
     }
 
-    boolean needRecalc;
+    private void touch() {
+        touchCount++;
+        long nowMs = Calendar.getInstance().getTimeInMillis();
+        long deltaMs = nowMs - firstTouchMs;
+        //Log.d(TAG, String.format("TOUCH: %d - %d = %d, %d",
+        //        firstTouchMs, nowMs, deltaMs, touchCount ) );
+
+        if ( deltaMs > TARGET_DELTA_MS ) {
+            touchRatioPS = (double)touchCount / (deltaMs/1000.0);
+            touchCount = 0;
+            firstTouchMs = nowMs;
+        }
+    }
+
+    private double getTouchRatioPS() {
+        return touchRatioPS;
+    }
+
 
     private double convertRssiDb2Lin( int db ) {
         return Math.pow( 10.0, db/10.0 );
@@ -40,7 +65,7 @@ public class DirectBeacon {
         }
     }
 
-    public void setRssi( int id, int rssi ) {
+    void setRssi( int id, int rssi ) {
         int idx = 0;
         if ( id == id1 ) {
             idx = 0;
@@ -50,7 +75,8 @@ public class DirectBeacon {
             Log.e(TAG, String.format("setRssi bad idx: %d %d   %d", id1, id2, id));
             return;
         }
-        Log.d(TAG, String.format("setRssi(%d ,%d, %f)", idx, rssi, convertRssiDb2Lin(rssi)));
+        touch();
+        //Log.d(TAG, String.format("setRssi(%d ,%d, %f)", idx, rssi, convertRssiDb2Lin(rssi)));
 
         LinkedList<Double> vals = rss.get(idx);
         vals.addLast(convertRssiDb2Lin(rssi));
@@ -85,9 +111,15 @@ public class DirectBeacon {
 
         if ( DetectParams.DEV_MODE ) {
             return String.format(Locale.ENGLISH,
-                    "[ %07X ] ( %5.2f %5.2f )xE6,  %.2f", id1, avg_rss[0]*1.0e6, avg_rss[1]*1.0e6, avg_diff);
+                    "[ %07X ] %4.1f ps, ( %5.2f %5.2f )xE6,  %.2f",
+                    id1,
+                    getTouchRatioPS(),
+                    avg_rss[0]*1.0e6, avg_rss[1]*1.0e6, avg_diff);
         } else {
-            return String.format("b.cone id[ %07" + "X ]", id1 );
+            return String.format(Locale.ENGLISH,
+                    "b.cone id[ %07X ] %4.1f ps",
+                    id1,
+                    getTouchRatioPS() );
         }
     }
 
