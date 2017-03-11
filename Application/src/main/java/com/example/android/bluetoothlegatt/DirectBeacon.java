@@ -78,20 +78,20 @@ public class DirectBeacon {
         needRecalc = false;
     }
 
-    public String getInfoString() {
+    String getInfoString() {
         if ( needRecalc ) {
             recalc();
         }
 
         if ( DetectParams.DEV_MODE ) {
             return String.format(Locale.ENGLISH,
-                    "[ %07X ] ( %5.1f %5.1f )xE6,  %.2f", id1, avg_rss[0]*1.0e6, avg_rss[1]*1.0e6, avg_diff);
+                    "[ %07X ] ( %5.2f %5.2f )xE6,  %.2f", id1, avg_rss[0]*1.0e6, avg_rss[1]*1.0e6, avg_diff);
         } else {
             return String.format("b.cone id[ %07" + "X ]", id1 );
         }
     }
 
-    public boolean isVisible() {
+    boolean isVisible() {
         if ( rss.get(0).size() < DetectParams.AVG_CNT ) {
             return false;
         }

@@ -23,6 +23,11 @@
     <string name="disconnected">Disconnected</string>
     <string name="title_devices">b.cone</string>
     <string name="error_bluetooth_not_supported">Bluetooth not supported.</string>
+    <string name="ask_enable_location">BLE need Location Service to be enabled. Enable it?</string>
+    <string name="permission_granted">Permission was granted</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
     <string name="visible">in cone</string>
     <string name="invisible">not in cone</string>
