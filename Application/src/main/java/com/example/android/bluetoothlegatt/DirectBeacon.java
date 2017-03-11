@@ -23,6 +23,11 @@ class DirectBeacon {
     private long firstTouchMs = 0;
     private long TARGET_DELTA_MS = 1500;
 
+    private int[] idxSpinnerIdx = new int[2];
+    private String idxSpinnerStr = "|.|";
+    private static String[] spinnerStr = { "|", "/", "-", "\\" };
+    private static int spinnerSz = 4;
+
     private ArrayList<LinkedList<Double>> rss = new ArrayList<>();
 
     DirectBeacon(int id1, int id2) {
@@ -32,9 +37,11 @@ class DirectBeacon {
         rss.add(1, new LinkedList<Double>());
         needRecalc = true;
         firstTouchMs = Calendar.getInstance().getTimeInMillis();
+        idxSpinnerIdx[0] = 0;
+        idxSpinnerIdx[1] = 1;
     }
 
-    private void touch() {
+    private void touchRatio() {
         touchCount++;
         long nowMs = Calendar.getInstance().getTimeInMillis();
         long deltaMs = nowMs - firstTouchMs;
@@ -52,6 +59,12 @@ class DirectBeacon {
         return touchRatioPS;
     }
 
+    private void touchIndex(int idx) {
+        if ( idx == 0 || idx == 1 ) {
+            idxSpinnerIdx[idx] = (idxSpinnerIdx[idx]+1) % spinnerSz;
+        }
+        idxSpinnerStr = spinnerStr[idxSpinnerIdx[0]] + "." + spinnerStr[idxSpinnerIdx[1]];
+    }
 
     private double convertRssiDb2Lin( int db ) {
         return Math.pow( 10.0, db/10.0 );
@@ -75,7 +88,8 @@ class DirectBeacon {
             Log.e(TAG, String.format("setRssi bad idx: %d %d   %d", id1, id2, id));
             return;
         }
-        touch();
+        touchRatio();
+        touchIndex(idx);
         //Log.d(TAG, String.format("setRssi(%d ,%d, %f)", idx, rssi, convertRssiDb2Lin(rssi)));
 
         LinkedList<Double> vals = rss.get(idx);
@@ -111,15 +125,17 @@ class DirectBeacon {
 
         if ( DetectParams.DEV_MODE ) {
             return String.format(Locale.ENGLISH,
-                    "[ %07X ] %4.1f ps, ( %5.2f %5.2f )xE6,  %.2f",
+                    "[%07X] %4.1fps %s (%5.2f %5.2f)xE6, %.2f",
                     id1,
                     getTouchRatioPS(),
+                    idxSpinnerStr,
                     avg_rss[0]*1.0e6, avg_rss[1]*1.0e6, avg_diff);
         } else {
             return String.format(Locale.ENGLISH,
-                    "b.cone id[ %07X ] %4.1f ps",
+                    "[%07X] %4.1fps %s",
                     id1,
-                    getTouchRatioPS() );
+                    getTouchRatioPS(),
+                    idxSpinnerStr );
         }
     }
 
