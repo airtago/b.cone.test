@@ -7,10 +7,10 @@
         android:defaultValue="10.0">
     </EditTextPreference>
     <EditTextPreference
-        android:key="AVG_CNT"
-        android:summary="Times to average"
-        android:title="Averager count"
-        android:defaultValue="5">
+        android:key="AVG_TIME"
+        android:summary="Time to average in ms"
+        android:title="Averager time (ms)"
+        android:defaultValue="1000">
     </EditTextPreference>
     <CheckBoxPreference
         android:key="INVERT_ANTS_IDXS"
