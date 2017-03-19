@@ -9,10 +9,48 @@ import java.util.Locale;
 
 class DirectBeacon {
 
+    private class PreBeacon {
+        int idx = 0;
+        long time = 0;
+        double dbVal = -100.0;
+        boolean isEmpty = true;
+
+        void CreateNew( int idx, long time, double dbVal ) {
+            this.idx = idx;
+            this.time = time;
+            this.dbVal = dbVal;
+            this.isEmpty = false;
+        }
+    }
+
+    private class BeaconData {
+        long time = 0;
+        double[] dbValue  = new double[2];
+        double[] linValue = new double[2];
+
+        double dbDiff;
+        double linDiff;
+
+        BeaconData( long time, double dbVal0, double dbVal1 ) {
+            this.time = time;
+            dbValue[0] = dbVal0;
+            dbValue[1] = dbVal1;
+
+            linValue[0] = convertRssiDb2Lin(dbVal0);
+            linValue[1] = convertRssiDb2Lin(dbVal1);
+
+            dbDiff = linValue[0]/linValue[1];
+            linDiff = convertRssiDb2Lin(dbDiff);
+        }
+
+    }
+
     private final static String TAG = "DBeacon";
 
     private int id1;
     private int id2;
+
+    PreBeacon preBeacon = new PreBeacon();
 
     private double[] avg_rss = new double[2];
     private double avg_diff;
@@ -28,13 +66,11 @@ class DirectBeacon {
     private static String[] spinnerStr = { "|", "/", "-", "\\" };
     private static int spinnerSz = 4;
 
-    private ArrayList<LinkedList<Double>> rss = new ArrayList<>();
+    private LinkedList<BeaconData> values = new LinkedList<>();
 
     DirectBeacon(int id1, int id2) {
         this.id1 = id1;
         this.id2 = id2;
-        rss.add(0, new LinkedList<Double>());
-        rss.add(1, new LinkedList<Double>());
         needRecalc = true;
         firstTouchMs = Calendar.getInstance().getTimeInMillis();
         idxSpinnerIdx[0] = 0;
@@ -66,7 +102,7 @@ class DirectBeacon {
         idxSpinnerStr = spinnerStr[idxSpinnerIdx[0]] + "." + spinnerStr[idxSpinnerIdx[1]];
     }
 
-    private double convertRssiDb2Lin( int db ) {
+    private double convertRssiDb2Lin( double db ) {
         return Math.pow( 10.0, db/10.0 );
     }
 
@@ -88,32 +124,97 @@ class DirectBeacon {
             Log.e(TAG, String.format("setRssi bad idx: %d %d   %d", id1, id2, id));
             return;
         }
-        touchRatio();
-        touchIndex(idx);
-        //Log.d(TAG, String.format("setRssi(%d ,%d, %f)", idx, rssi, convertRssiDb2Lin(rssi)));
 
-        LinkedList<Double> vals = rss.get(idx);
-        vals.addLast(convertRssiDb2Lin(rssi));
+        long curTime = Calendar.getInstance().getTimeInMillis();
+        int thisIdx    = idx;
+        int anotherIdx = (idx+1) % 2;
 
-        while ( vals.size() > DetectParams.AVG_CNT ) {
-            vals.removeFirst();
+        //Log.d(TAG, "?" + idx + " " + curTime % 10000 );
+
+
+        boolean addNew = false;
+
+        if ( preBeacon.isEmpty ) {
+            preBeacon.CreateNew( thisIdx, curTime, rssi );
+            Log.d(TAG, "Create NEW");
+
+        } else {
+
+            if ( preBeacon.idx == thisIdx ) {
+                Log.d(TAG, "DROP: " + thisIdx + " " + Math.abs(curTime - preBeacon.time) + "ms");
+                preBeacon.CreateNew( thisIdx, curTime, rssi );
+
+            } else {
+
+                if (Math.abs( curTime - preBeacon.time ) > 100 ) {
+                    Log.d(TAG, "DROP: " + thisIdx + " " + Math.abs(curTime - preBeacon.time) + "ms");
+                    preBeacon.CreateNew( thisIdx, curTime, rssi );
+
+                } else {
+
+                    Log.d(TAG, "+++++++++ ADD: time " + Math.abs( curTime - preBeacon.time ));
+
+                    BeaconData newData;
+                    if ( thisIdx == 0 ) {
+                        newData = new BeaconData(curTime, rssi, preBeacon.dbVal);
+                    } else {
+                        newData = new BeaconData(curTime, preBeacon.dbVal, rssi);
+                    }
+                    values.addLast(newData);
+                    preBeacon.isEmpty = true;
+                    needRecalc = true;
+                    touchRatio();
+                }
+            }
+
         }
-        needRecalc = true;
 
-        Log.d(TAG, getInfoString() );
+        if ( !values.isEmpty() ) {
+            while (curTime - values.peekFirst().time > DetectParams.AVG_TIME) {
+                values.removeFirst();
+                needRecalc = true;
+
+                if ( values.isEmpty() ) {
+                    break;
+                }
+            }
+        }
+
+
+
+        //touchIndex(idx);
+
+        //printValues();
+
+    }
+
+    private void printValues() {
+
+        if ( !values.isEmpty() ) {
+            String s = ">>>>> ";
+            for (BeaconData x : values) {
+                s += x.time % 10000;
+                s += " (";
+                s += (int) x.dbValue[0];
+                s += ",";
+                s += (int) x.dbValue[1];
+                s += ");  ";
+            }
+            Log.d(TAG, s);
+        }
     }
 
     private void recalc() {
-        for ( int idx = 0; idx < 2; idx++ ) {
-            LinkedList<Double> vals = rss.get(idx);
-            double sum = 0;
-            for ( double x : vals ) {
-                sum += x;
-            }
-            avg_rss[idx] =  sum / (double)vals.size();
-        }
 
-        avg_diff = calcDiff(avg_rss[0], avg_rss[1]);
+        double sum = 0;
+        for ( BeaconData x : values ) {
+            sum += x.dbDiff;
+        }
+        if ( values.size() != 0 ) {
+            avg_diff = sum / values.size();
+        } else {
+            avg_diff = 0.0;
+        }
 
         needRecalc = false;
     }
@@ -140,7 +241,7 @@ class DirectBeacon {
     }
 
     boolean isVisible() {
-        if ( rss.get(0).size() < DetectParams.AVG_CNT ) {
+        if ( values.isEmpty() ) {
             return false;
         }
 
