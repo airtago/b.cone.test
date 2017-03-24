@@ -12,6 +12,12 @@
         android:title="Averager time (ms)"
         android:defaultValue="1000">
     </EditTextPreference>
+    <EditTextPreference
+        android:key="TX_TARGET_TIME"
+        android:summary="Delay between packets tx in ms"
+        android:title="Packet's delay (ms)"
+        android:defaultValue="200">
+    </EditTextPreference>
     <CheckBoxPreference
         android:key="INVERT_ANTS_IDXS"
         android:summary="Use inverted antenna's 'minor' values"

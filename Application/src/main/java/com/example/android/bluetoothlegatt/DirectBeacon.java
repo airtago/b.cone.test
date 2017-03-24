@@ -9,6 +9,50 @@ import java.util.Locale;
 
 class DirectBeacon {
 
+    private class RcvStat {
+        private ArrayList<LinkedList<Long>> vals = new ArrayList<>();
+
+        RcvStat() {
+            for( int i = 0; i < 3; i++ ) {
+                vals.add( new LinkedList<Long>() );
+            }
+        }
+
+        void touch( int idx, long time ) {
+            vals.get(idx).addLast(time);
+            clearOld(time);
+        }
+
+        private void clearOld( long curTime ) {
+            for( int i = 0; i < 3; i++ ) {
+                LinkedList<Long> times = vals.get(i);
+                if ( !times.isEmpty() ) {
+                    while (curTime - times.peekFirst() > DetectParams.AVG_TIME) {
+                        times.removeFirst();
+
+                        if ( times.isEmpty() ) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        public String toString() {
+            String s = "";
+
+            double sentCount = DetectParams.AVG_TIME / 200.0;
+            s += " 0: " + (int)(100.0 * vals.get(0).size() / sentCount) + "%";
+            s += " 1: " + (int)(100.0 * vals.get(1).size() / sentCount) + "%";
+            s += " P: " + (int)(100.0 * vals.get(2).size() / sentCount) + "%";
+            s += " ";
+
+            return s;
+        }
+
+    };
+    private RcvStat rcvStat = new RcvStat();
+
     private class PreBeacon {
         int idx = 0;
         long time = 0;
@@ -50,21 +94,13 @@ class DirectBeacon {
     private int id1;
     private int id2;
 
-    PreBeacon preBeacon = new PreBeacon();
+    private PreBeacon preBeacon = new PreBeacon();
 
     private double[] avg_rss = new double[2];
     private double avg_diff;
     private boolean needRecalc = true;
 
-    private int touchCount = 0;
-    private double touchRatioPS = 0.0;
-    private long firstTouchMs = 0;
-    private long TARGET_DELTA_MS = 1500;
 
-    private int[] idxSpinnerIdx = new int[2];
-    private String idxSpinnerStr = "|.|";
-    private static String[] spinnerStr = { "|", "/", "-", "\\" };
-    private static int spinnerSz = 4;
 
     private LinkedList<BeaconData> values = new LinkedList<>();
 
@@ -72,35 +108,8 @@ class DirectBeacon {
         this.id1 = id1;
         this.id2 = id2;
         needRecalc = true;
-        firstTouchMs = Calendar.getInstance().getTimeInMillis();
-        idxSpinnerIdx[0] = 0;
-        idxSpinnerIdx[1] = 1;
     }
 
-    private void touchRatio() {
-        touchCount++;
-        long nowMs = Calendar.getInstance().getTimeInMillis();
-        long deltaMs = nowMs - firstTouchMs;
-        //Log.d(TAG, String.format("TOUCH: %d - %d = %d, %d",
-        //        firstTouchMs, nowMs, deltaMs, touchCount ) );
-
-        if ( deltaMs > TARGET_DELTA_MS ) {
-            touchRatioPS = (double)touchCount / (deltaMs/1000.0);
-            touchCount = 0;
-            firstTouchMs = nowMs;
-        }
-    }
-
-    private double getTouchRatioPS() {
-        return touchRatioPS;
-    }
-
-    private void touchIndex(int idx) {
-        if ( idx == 0 || idx == 1 ) {
-            idxSpinnerIdx[idx] = (idxSpinnerIdx[idx]+1) % spinnerSz;
-        }
-        idxSpinnerStr = spinnerStr[idxSpinnerIdx[0]] + "." + spinnerStr[idxSpinnerIdx[1]];
-    }
 
     private double convertRssiDb2Lin( double db ) {
         return Math.pow( 10.0, db/10.0 );
@@ -115,7 +124,7 @@ class DirectBeacon {
     }
 
     void setRssi( int id, int rssi ) {
-        int idx = 0;
+        int idx;
         if ( id == id1 ) {
             idx = 0;
         } else if ( id == id2 ){
@@ -127,12 +136,12 @@ class DirectBeacon {
 
         long curTime = Calendar.getInstance().getTimeInMillis();
         int thisIdx    = idx;
-        int anotherIdx = (idx+1) % 2;
+        //int anotherIdx = (idx+1) % 2;
 
         //Log.d(TAG, "?" + idx + " " + curTime % 10000 );
 
+        rcvStat.touch(thisIdx, curTime);
 
-        boolean addNew = false;
 
         if ( preBeacon.isEmpty ) {
             preBeacon.CreateNew( thisIdx, curTime, rssi );
@@ -153,6 +162,7 @@ class DirectBeacon {
                 } else {
 
                     Log.d(TAG, "+++++++++ ADD: time " + Math.abs( curTime - preBeacon.time ));
+                    rcvStat.touch(2, curTime);
 
                     BeaconData newData;
                     if ( thisIdx == 0 ) {
@@ -163,7 +173,6 @@ class DirectBeacon {
                     values.addLast(newData);
                     preBeacon.isEmpty = true;
                     needRecalc = true;
-                    touchRatio();
                 }
             }
 
@@ -179,11 +188,6 @@ class DirectBeacon {
                 }
             }
         }
-
-
-
-        //touchIndex(idx);
-
         //printValues();
 
     }
@@ -206,12 +210,19 @@ class DirectBeacon {
 
     private void recalc() {
 
-        double sum = 0;
+        double sum = 0.0;
+        avg_rss[0] = 0.0;
+        avg_rss[1] = 0.0;
         for ( BeaconData x : values ) {
             sum += x.dbDiff;
+            avg_rss[0] += x.linValue[0];
+            avg_rss[1] += x.linValue[1];
         }
-        if ( values.size() != 0 ) {
-            avg_diff = sum / values.size();
+        int count = values.size();
+        if ( count != 0 ) {
+            avg_diff = sum / count;
+            avg_rss[0] /= count;
+            avg_rss[1] /= count;
         } else {
             avg_diff = 0.0;
         }
@@ -226,17 +237,15 @@ class DirectBeacon {
 
         if ( DetectParams.DEV_MODE ) {
             return String.format(Locale.ENGLISH,
-                    "[%07X] %4.1fps %s (%5.2f %5.2f)xE6, %.2f",
+                    "[%07X]%s(%5.2f %5.2f)e-6, %.2f",
                     id1,
-                    getTouchRatioPS(),
-                    idxSpinnerStr,
+                    rcvStat.toString(),
                     avg_rss[0]*1.0e6, avg_rss[1]*1.0e6, avg_diff);
         } else {
             return String.format(Locale.ENGLISH,
-                    "[%07X] %4.1fps %s",
+                    "[%07X]%s",
                     id1,
-                    getTouchRatioPS(),
-                    idxSpinnerStr );
+                    rcvStat.toString() );
         }
     }
 
