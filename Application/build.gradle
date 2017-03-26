@@ -37,8 +37,8 @@ android {
         minSdkVersion 23
         targetSdkVersion 25
 
-        versionCode 9
-        versionName "1.23.1"
+        versionCode 10
+        versionName "1.23.2"
         archivesBaseName = "b.cone-$versionName"
     }
 

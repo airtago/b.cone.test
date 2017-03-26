@@ -40,6 +40,53 @@
     <string name="unknown_characteristic">Unknown characteristic</string>
     <string name="unknown_service">Unknown service</string>
 
+    <!-- Pref -->
+    <string-array name="CallbackTypeEntries">
+        <item>CALLBACK_TYPE_ALL_MATCHES</item>
+        <item>CALLBACK_TYPE_FIRST_MATCH</item>
+        <item>CALLBACK_TYPE_MATCH_LOST</item>
+        <item>FIRST_MATCH | MATCH_LOST</item>
+    </string-array>
+    <string-array name="CallbackTypeValues">
+        <item>1</item>
+        <item>2</item>
+        <item>4</item>
+        <item>6</item>
+    </string-array>
+
+    <string-array name="ScanModeEntries">
+        <item>SCAN_MODE_BALANCED</item>
+        <item>SCAN_MODE_LOW_LATENCY</item>
+        <item>SCAN_MODE_LOW_POWER</item>
+        <item>SCAN_MODE_OPPORTUNISTIC</item>
+    </string-array>
+    <string-array name="ScanModeValues">
+        <item>1</item>
+        <item>2</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="NumOfMatchesEntries">
+        <item>MATCH_NUM_FEW_ADVERTISEMENT</item>
+        <item>MATCH_NUM_MAX_ADVERTISEMENT</item>
+        <item>MATCH_NUM_ONE_ADVERTISEMENT</item>
+    </string-array>
+    <string-array name="NumOfMatchesValues">
+        <item>2</item>
+        <item>3</item>
+        <item>1</item>
+    </string-array>
+
+    <string-array name="MatchModeEntries">
+        <item>MATCH_MODE_AGGRESSIVE</item>
+        <item>MATCH_MODE_STICKY</item>
+    </string-array>
+    <string-array name="MatchModeValues">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
     <!-- Menu items -->
     <string name="menu_connect">Connect</string>
     <string name="menu_disconnect">Disconnect</string>

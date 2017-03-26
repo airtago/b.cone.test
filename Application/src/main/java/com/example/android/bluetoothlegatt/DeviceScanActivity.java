@@ -84,124 +84,55 @@ public class DeviceScanActivity extends ListActivity {
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
 
+        // ******************************************************************
+        int n = -100;
         try {
-            if (sp.getBoolean("CALLBACK_TYPE_ALL_MATCHES", true)) {
-                builder.setScanMode(ScanSettings.CALLBACK_TYPE_ALL_MATCHES);
-            }
+            n = Integer.parseInt( sp.getString("listCallbackType", "1" ) );
+            builder.setCallbackType(n);
         } catch (java.lang.IllegalArgumentException e) {
-            Log.e(TAG, "setScanMode(CALLBACK_TYPE_ALL_MATCHES) error");
+            Log.e(TAG, "setCallbackType() error, n = " + n );
             Toast.makeText(DeviceScanActivity.this,
-                    "setScanMode(CALLBACK_TYPE_ALL_MATCHES) error",
+                    "setCallbackType() error, n = " + n,
                     Toast.LENGTH_LONG).show();
         }
+        // ******************************************************************
         try {
-            if (sp.getBoolean("CALLBACK_TYPE_FIRST_MATCH", false)) {
-                builder.setScanMode(ScanSettings.CALLBACK_TYPE_FIRST_MATCH);
-            }
+            n = Integer.parseInt( sp.getString("listMatchMode", "1" ) );
+            builder.setMatchMode(n);
         } catch (java.lang.IllegalArgumentException e) {
-            Log.e(TAG, "setScanMode(CALLBACK_TYPE_FIRST_MATCH) error");
+            Log.e(TAG, "setMatchMode() error, n = " + n );
             Toast.makeText(DeviceScanActivity.this,
-                    "setScanMode(CALLBACK_TYPE_FIRST_MATCH) error",
+                    "setMatchMode() error, n = " + n,
                     Toast.LENGTH_LONG).show();
         }
+        // ******************************************************************
         try {
-            if (sp.getBoolean("CALLBACK_TYPE_MATCH_LOST", false)) {
-                builder.setScanMode(ScanSettings.CALLBACK_TYPE_MATCH_LOST);
-            }
+            n = Integer.parseInt( sp.getString("listNumOfMatches", "3" ) );
+            builder.setNumOfMatches(n);
         } catch (java.lang.IllegalArgumentException e) {
-            Log.e(TAG, "setScanMode(CALLBACK_TYPE_MATCH_LOST) error");
+            Log.e(TAG, "setNumOfMatches() error, n = " + n );
             Toast.makeText(DeviceScanActivity.this,
-                    "setScanMode(CALLBACK_TYPE_MATCH_LOST) error",
+                    "setNumOfMatches() error, n = " + n,
                     Toast.LENGTH_LONG).show();
         }
+        // ******************************************************************
         try {
-            if (sp.getBoolean("MATCH_MODE_AGGRESSIVE", true)) {
-                builder.setScanMode(ScanSettings.MATCH_MODE_AGGRESSIVE);
-            }
+            n = Integer.parseInt( sp.getString("listScanMode", "2" ) );
+            builder.setScanMode(n);
         } catch (java.lang.IllegalArgumentException e) {
-            Log.e(TAG, "setScanMode(MATCH_MODE_AGGRESSIVE) error");
+            Log.e(TAG, "setScanMode() error, n = " + n );
             Toast.makeText(DeviceScanActivity.this,
-                    "setScanMode(MATCH_MODE_AGGRESSIVE) error",
+                    "setScanMode() error, n = " + n,
                     Toast.LENGTH_LONG).show();
         }
+        // ******************************************************************
         try {
-            if (sp.getBoolean("MATCH_MODE_STICKY", false)) {
-                builder.setScanMode(ScanSettings.MATCH_MODE_STICKY);
-            }
+            n = Integer.parseInt( sp.getString("REPORT_DELAY", "0" ) );
+            builder.setReportDelay(n);
         } catch (java.lang.IllegalArgumentException e) {
-            Log.e(TAG, "setScanMode(MATCH_MODE_STICKY) error");
+            Log.e(TAG, "setReportDelay() error, n = " + n );
             Toast.makeText(DeviceScanActivity.this,
-                    "setScanMode(MATCH_MODE_STICKY) error",
-                    Toast.LENGTH_LONG).show();
-        }
-        try {
-            if (sp.getBoolean("MATCH_NUM_FEW_ADVERTISEMENT", false)) {
-                builder.setScanMode(ScanSettings.MATCH_NUM_FEW_ADVERTISEMENT);
-            }
-        } catch (java.lang.IllegalArgumentException e) {
-            Log.e(TAG, "setScanMode(MATCH_NUM_FEW_ADVERTISEMENT) error");
-            Toast.makeText(DeviceScanActivity.this,
-                    "setScanMode(MATCH_NUM_FEW_ADVERTISEMENT) error",
-                    Toast.LENGTH_LONG).show();
-        }
-        try {
-            if (sp.getBoolean("MATCH_NUM_MAX_ADVERTISEMENT", false)) {
-                builder.setScanMode(ScanSettings.MATCH_NUM_MAX_ADVERTISEMENT);
-            }
-        } catch (java.lang.IllegalArgumentException e) {
-            Log.e(TAG, "setScanMode(MATCH_NUM_MAX_ADVERTISEMENT) error");
-            Toast.makeText(DeviceScanActivity.this,
-                    "setScanMode(MATCH_NUM_MAX_ADVERTISEMENT) error",
-                    Toast.LENGTH_LONG).show();
-        }
-        try {
-            if (sp.getBoolean("MATCH_NUM_ONE_ADVERTISEMENT", false)) {
-                builder.setScanMode(ScanSettings.MATCH_NUM_ONE_ADVERTISEMENT);
-            }
-        } catch (java.lang.IllegalArgumentException e) {
-            Log.e(TAG, "setScanMode(MATCH_NUM_ONE_ADVERTISEMENT) error");
-            Toast.makeText(DeviceScanActivity.this,
-                    "setScanMode(MATCH_NUM_ONE_ADVERTISEMENT) error",
-                    Toast.LENGTH_LONG).show();
-        }
-        try {
-            if (sp.getBoolean("SCAN_MODE_BALANCED", false)) {
-                builder.setScanMode(ScanSettings.SCAN_MODE_BALANCED);
-            }
-        } catch (java.lang.IllegalArgumentException e) {
-            Log.e(TAG, "setScanMode(SCAN_MODE_BALANCED) error");
-            Toast.makeText(DeviceScanActivity.this,
-                    "setScanMode(SCAN_MODE_BALANCED) error",
-                    Toast.LENGTH_LONG).show();
-        }
-        try {
-            if (sp.getBoolean("SCAN_MODE_LOW_LATENCY", true)) {
-                builder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
-            }
-        } catch (java.lang.IllegalArgumentException e) {
-            Log.e(TAG, "setScanMode(SCAN_MODE_LOW_LATENCY) error");
-            Toast.makeText(DeviceScanActivity.this,
-                    "setScanMode(SCAN_MODE_LOW_LATENCY) error",
-                    Toast.LENGTH_LONG).show();
-        }
-        try {
-            if (sp.getBoolean("SCAN_MODE_LOW_POWER", false)) {
-                builder.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER);
-            }
-        } catch (java.lang.IllegalArgumentException e) {
-            Log.e(TAG, "setScanMode(SCAN_MODE_LOW_POWER) error");
-            Toast.makeText(DeviceScanActivity.this,
-                    "setScanMode(SCAN_MODE_LOW_POWER) error",
-                    Toast.LENGTH_LONG).show();
-        }
-        try {
-            if (sp.getBoolean("SCAN_MODE_OPPORTUNISTIC", true)) {
-                builder.setScanMode(ScanSettings.SCAN_MODE_OPPORTUNISTIC);
-            }
-        } catch (java.lang.IllegalArgumentException e) {
-            Log.e(TAG, "setScanMode(SCAN_MODE_OPPORTUNISTIC) error");
-            Toast.makeText(DeviceScanActivity.this,
-                    "setScanMode(SCAN_MODE_OPPORTUNISTIC) error",
+                    "setReportDelay() error, n = " + n,
                     Toast.LENGTH_LONG).show();
         }
 
