@@ -1,5 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="ble_settings_category"
+        android:title="BLE settings"
+        android:persistent="false" >
+        <CheckBoxPreference
+            android:key="CALLBACK_TYPE_ALL_MATCHES"
+            android:summary="Trigger a callback for every Bluetooth advertisement found that matches the filter criteria. If no filter is active, all advertisement packets are reported."
+            android:title="CALLBACK_TYPE_ALL_MATCHES"
+            android:defaultValue="true">
+        </CheckBoxPreference>
+        <CheckBoxPreference
+            android:key="CALLBACK_TYPE_FIRST_MATCH"
+            android:summary="A result callback is only triggered for the first advertisement packet received that matches the filter criteria."
+            android:title="CALLBACK_TYPE_FIRST_MATCH"
+            android:defaultValue="false">
+        </CheckBoxPreference>
+        <CheckBoxPreference
+            android:key="CALLBACK_TYPE_MATCH_LOST"
+            android:summary="Receive a callback when advertisements are no longer received from a device that has been previously reported by a first match callback."
+            android:title="CALLBACK_TYPE_MATCH_LOST"
+            android:defaultValue="false">
+        </CheckBoxPreference>
+        <CheckBoxPreference
+            android:key="MATCH_MODE_AGGRESSIVE"
+            android:summary="In Aggressive mode, hw will determine a match sooner even with feeble signal strength and few number of sightings/match in a duration."
+            android:title="MATCH_MODE_AGGRESSIVE"
+            android:defaultValue="true">
+        </CheckBoxPreference>
+        <CheckBoxPreference
+            android:key="MATCH_MODE_STICKY"
+            android:summary="For sticky mode, higher threshold of signal strength and sightings is required before reporting by hw"
+            android:title="MATCH_MODE_STICKY"
+            android:defaultValue="false">
+        </CheckBoxPreference>
+        <CheckBoxPreference
+            android:key="MATCH_NUM_FEW_ADVERTISEMENT"
+            android:summary="Match few advertisement per filter, depends on current capability and availibility of the resources in hw"
+            android:title="MATCH_NUM_FEW_ADVERTISEMENT"
+            android:defaultValue="false">
+        </CheckBoxPreference>
+        <CheckBoxPreference
+            android:key="MATCH_NUM_MAX_ADVERTISEMENT"
+            android:summary="Match as many advertisement per filter as hw could allow, depends on current capability and availibility of the resources in hw"
+            android:title="MATCH_NUM_MAX_ADVERTISEMENT"
+            android:defaultValue="false">
+        </CheckBoxPreference>
+        <CheckBoxPreference
+            android:key="MATCH_NUM_ONE_ADVERTISEMENT"
+            android:summary="Match one advertisement per filter"
+            android:title="MATCH_NUM_ONE_ADVERTISEMENT"
+            android:defaultValue="false">
+        </CheckBoxPreference>
+        <CheckBoxPreference
+            android:key="SCAN_MODE_BALANCED"
+            android:summary="Perform Bluetooth LE scan in balanced power mode. Scan results are returned at a rate that provides a good trade-off between scan frequency and power consumption."
+            android:title="SCAN_MODE_BALANCED"
+            android:defaultValue="false">
+        </CheckBoxPreference>
+        <CheckBoxPreference
+            android:key="SCAN_MODE_LOW_LATENCY"
+            android:summary="Scan using highest duty cycle. It's recommended to only use this mode when the application is running in the foreground."
+            android:title="SCAN_MODE_LOW_LATENCY"
+            android:defaultValue="true">
+        </CheckBoxPreference>
+        <CheckBoxPreference
+            android:key="SCAN_MODE_LOW_POWER"
+            android:summary="Perform Bluetooth LE scan in low power mode. This is the default scan mode as it consumes the least power."
+            android:title="SCAN_MODE_LOW_POWER"
+            android:defaultValue="false">
+        </CheckBoxPreference>
+        <CheckBoxPreference
+            android:key="SCAN_MODE_OPPORTUNISTIC"
+            android:summary="A special Bluetooth LE scan mode. Applications using this scan mode will passively listen for other scan results without starting BLE scans themselves."
+            android:title="SCAN_MODE_OPPORTUNISTIC"
+            android:defaultValue="true">
+        </CheckBoxPreference>
+    </PreferenceScreen>
     <EditTextPreference
         android:key="DIFF_THRESHOLD"
         android:summary="Threshold value for visibility"
