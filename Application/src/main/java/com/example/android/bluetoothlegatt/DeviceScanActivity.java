@@ -78,10 +78,11 @@ public class DeviceScanActivity extends ListActivity {
     private static final int B_CONE_REQUEST_ACCESS_FINE_LOCATION = 2;
 
     ScanSettings leScanSettings = new ScanSettings.Builder()
-            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-            //.setScanMode(ScanSettings.MATCH_MODE_AGGRESSIVE)
             .setScanMode(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
-            //.setScanMode(ScanSettings.MATCH_NUM_MAX_ADVERTISEMENT)
+            .setScanMode(ScanSettings.MATCH_MODE_AGGRESSIVE)
+            .setScanMode(ScanSettings.MATCH_NUM_MAX_ADVERTISEMENT)
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .setScanMode(ScanSettings.SCAN_MODE_OPPORTUNISTIC)
             .build();
 
     List<ScanFilter> leScanFilters = new ArrayList<>();

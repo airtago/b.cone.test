@@ -16,9 +16,9 @@ repositories {
 }
 
 dependencies {
-    compile "com.android.support:support-v4:23.3.0"
-    compile "com.android.support:support-v13:23.3.0"
-    compile "com.android.support:cardview-v7:23.3.0"
+    compile 'com.android.support:support-v4:25.1.0'
+    compile 'com.android.support:support-v13:25.1.0'
+    compile 'com.android.support:cardview-v7:25.1.0'
 }
 
 // The sample build uses multiple directories to
@@ -31,14 +31,14 @@ List<String> dirs = [
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 23
 
         versionCode 9
-        versionName "1.1.0"
+        versionName "1.23.1"
         archivesBaseName = "b.cone-$versionName"
     }
 
