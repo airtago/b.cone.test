@@ -38,7 +38,7 @@ android {
         targetSdkVersion 23
 
         versionCode 10
-        versionName "1.1.0-dbg"
+        versionName "1.1.1"
         archivesBaseName = "b.cone-$versionName"
     }
 
