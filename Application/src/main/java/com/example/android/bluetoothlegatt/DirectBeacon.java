@@ -41,7 +41,7 @@ class DirectBeacon {
         public String toString() {
             String s = "";
 
-            double sentCount = DetectParams.AVG_TIME / 200.0;
+            double sentCount = DetectParams.AVG_TIME / DetectParams.TX_TARGET_TIME;
             s += " 0: " + (int)(100.0 * vals.get(0).size() / sentCount) + "%";
             s += " 1: " + (int)(100.0 * vals.get(1).size() / sentCount) + "%";
             s += " P: " + (int)(100.0 * vals.get(2).size() / sentCount) + "%";
