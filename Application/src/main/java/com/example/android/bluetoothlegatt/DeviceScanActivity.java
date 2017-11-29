@@ -47,6 +47,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.
@@ -57,7 +62,9 @@ public class DeviceScanActivity extends ListActivity {
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
+    private boolean mLogging = true;
     private Handler mHandler;
+    private Menu mMenu;
 
     private SharedPreferences sharedPreferences;
 
@@ -152,6 +159,8 @@ public class DeviceScanActivity extends ListActivity {
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
 
+        LogStorage.setLogging(mLogging);
+
         // Checks if Bluetooth is supported on the device.
         if (mBluetoothAdapter == null) {
             Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
@@ -178,6 +187,7 @@ public class DeviceScanActivity extends ListActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+        mMenu = menu;
         if (!mScanning) {
             menu.findItem(R.id.menu_stop).setVisible(false);
             menu.findItem(R.id.menu_scan).setVisible(true);
@@ -189,6 +199,15 @@ public class DeviceScanActivity extends ListActivity {
                     R.layout.actionbar_indeterminate_progress);
         }
         menu.findItem(R.id.menu_settings).setVisible(true);
+
+        if (!mLogging) {
+            menu.findItem(R.id.menu_start_log).setVisible(true);
+            menu.findItem(R.id.menu_stop_log).setVisible(false);
+        } else {
+            menu.findItem(R.id.menu_start_log).setVisible(false);
+            menu.findItem(R.id.menu_stop_log).setVisible(true);
+        }
+
         return true;
     }
 
@@ -206,7 +225,12 @@ public class DeviceScanActivity extends ListActivity {
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 break;
-        }
+            case R.id.menu_start_log:
+                startLogger();
+                break;
+            case R.id.menu_stop_log:
+                stopLogger();
+                break;        }
         return true;
     }
 
@@ -278,6 +302,56 @@ public class DeviceScanActivity extends ListActivity {
         invalidateOptionsMenu();
     }
 
+    private void startLogger(){
+        mLogging = true;
+        LogStorage.setLogging(true);
+        mMenu.findItem(R.id.menu_start_log).setVisible(false);
+        mMenu.findItem(R.id.menu_stop_log).setVisible(true);
+    }
+    private void stopLogger(){
+        LogStorage.setLogging(false);
+        while (LogStorage.isNotEmpty()) {
+            writeLog(LogStorage.popString());
+        }
+        mLogging = false;
+        mMenu.findItem(R.id.menu_start_log).setVisible(true);
+        mMenu.findItem(R.id.menu_stop_log).setVisible(false);
+    }
+
+    private void writeLog(String stringForLog) {
+        if (!mLogging) {
+            return;
+        }
+
+        File logFile = new File("sdcard/b-cone-log.txt");
+        if (!logFile.exists())
+        {
+            try
+            {
+                logFile.createNewFile();
+            }
+            catch (IOException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        try
+        {
+            //BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append(stringForLog);
+            buf.newLine();
+            buf.close();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+
 
     // Adapter for holding devices found through scanning.
     private class LeDeviceListAdapter extends BaseAdapter {
@@ -334,6 +408,9 @@ public class DeviceScanActivity extends ListActivity {
             }
 
             DirectBeacon beacon = beaconsHolder.getBeacons().get(i);
+
+            LogStorage.pushString(beacon.getStringForLog());
+
             viewHolder.deviceName.setText( beacon.getInfoString() );
             if ( beacon.isVisible() ) {
                 viewHolder.deviceAddress.setText(R.string.visible);

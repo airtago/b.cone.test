@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Locale;
 
@@ -88,6 +89,14 @@ class DirectBeacon {
             Log.e(TAG, String.format("setRssi bad idx: %d %d   %d", id1, id2, id));
             return;
         }
+        Calendar calendar = Calendar.getInstance();
+        long curTime = calendar.getTimeInMillis();
+        Date logTime = calendar.getTime();
+
+        String log = String.format(Locale.ENGLISH, "%s: [%07X] packet id: %d time ms: %d rssi: %d",
+                logTime.toString(), id1, idx, curTime, rssi);
+        LogStorage.pushString(log);
+
         touchRatio();
         touchIndex(idx);
         //Log.d(TAG, String.format("setRssi(%d ,%d, %f)", idx, rssi, convertRssiDb2Lin(rssi)));
@@ -138,6 +147,21 @@ class DirectBeacon {
                     idxSpinnerStr );
         }
     }
+
+    String getStringForLog() {
+        if (needRecalc) {
+            recalc();
+        }
+//        double sentCount = DetectParams.AVG_TIME / DetectParams.TX_TARGET_TIME;
+
+        Calendar calendar = Calendar.getInstance();
+        Date currentTime = calendar.getTime();
+
+        return String.format(Locale.ENGLISH,
+                "%s: [%07X] (%5.2f %5.2f)e-6, %.2f", currentTime.toString(), id1,
+                avg_rss[0]*1.0e6, avg_rss[1]*1.0e6, avg_diff);
+    }
+
 
     boolean isVisible() {
         if ( rss.get(0).size() < DetectParams.AVG_CNT ) {

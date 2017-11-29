@@ -25,6 +25,16 @@
         android:orderInCategory="2"
         android:showAsAction="ifRoom|withText"/>
 
+    <item android:id="@+id/menu_start_log"
+        android:title="@string/t_menu_start_log"
+        android:orderInCategory="5"
+        android:showAsAction="always"
+        />
+    <item android:id="@+id/menu_stop_log"
+        android:title="@string/t_menu_stop_log"
+        android:orderInCategory="6"
+        android:showAsAction="ifRoom|withText"
+        />
     <item android:id="@+id/menu_scan"
           android:title="@string/menu_scan"
           android:orderInCategory="100"
