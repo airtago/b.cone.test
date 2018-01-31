@@ -51,6 +51,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 
 /**
@@ -58,11 +61,12 @@ import java.io.IOException;
  */
 public class DeviceScanActivity extends ListActivity {
     final static String TAG = "SCANNER";
+    public static final String PREF_KEY_LOG_ON_START = "log on start";
 
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
-    private boolean mLogging = true;
+    private boolean mLogging = false;
     private Handler mHandler;
     private Menu mMenu;
 
@@ -186,6 +190,9 @@ public class DeviceScanActivity extends ListActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        boolean logOnStart = this.sharedPreferences.getBoolean(PREF_KEY_LOG_ON_START, false);
+        mLogging = logOnStart;
+
         getMenuInflater().inflate(R.menu.main, menu);
         mMenu = menu;
         if (!mScanning) {
@@ -206,6 +213,11 @@ public class DeviceScanActivity extends ListActivity {
         } else {
             menu.findItem(R.id.menu_start_log).setVisible(false);
             menu.findItem(R.id.menu_stop_log).setVisible(true);
+        }
+
+        if (!logOnStart) {
+            menu.findItem(R.id.menu_log_on_start).setVisible(true);
+            menu.findItem(R.id.menu_no_log_on_start).setVisible(false);
         }
 
         return true;
@@ -230,7 +242,14 @@ public class DeviceScanActivity extends ListActivity {
                 break;
             case R.id.menu_stop_log:
                 stopLogger();
-                break;        }
+                break;
+            case R.id.menu_log_on_start:
+                logOnStartOn();
+                break;
+            case R.id.menu_no_log_on_start:
+                logOnStartOff();
+                break;
+        }
         return true;
     }
 
@@ -279,6 +298,7 @@ public class DeviceScanActivity extends ListActivity {
 
     }
 
+
     private void scanLeDevice(final boolean enable) {
         if (enable) {
             // Stops scanning after a pre-defined scan period.
@@ -300,6 +320,22 @@ public class DeviceScanActivity extends ListActivity {
             //mBluetoothAdapter.stopScan(mLeScanCallback);
         }
         invalidateOptionsMenu();
+    }
+
+    private void logOnStartOn() {
+        SharedPreferences.Editor e = sharedPreferences.edit();
+        e.putBoolean(PREF_KEY_LOG_ON_START, true);
+        e.apply();
+        mMenu.findItem(R.id.menu_log_on_start).setVisible(false);
+        mMenu.findItem(R.id.menu_no_log_on_start).setVisible(true);
+    }
+
+    private void logOnStartOff() {
+        SharedPreferences.Editor e = sharedPreferences.edit();
+        e.putBoolean(PREF_KEY_LOG_ON_START, false);
+        e.apply();
+        mMenu.findItem(R.id.menu_log_on_start).setVisible(true);
+        mMenu.findItem(R.id.menu_no_log_on_start).setVisible(false);
     }
 
     private void startLogger(){
@@ -369,6 +405,13 @@ public class DeviceScanActivity extends ListActivity {
             //byte minor = scanRecord[28];
 
             //Log.d(TAG, String.format("0x%08X %d %d", uuid, major, minor));
+
+            Calendar calendar = Calendar.getInstance();
+            long curTime = calendar.getTimeInMillis();
+            Date logTime = calendar.getTime();
+
+            LogStorage.pushString(String.format(Locale.ENGLISH,"%s: [%07X] packet major: %d time ms: %d rssi: %d",
+                    logTime.toString(), uuid, major, curTime, rssi));
 
             return beaconsHolder.addInfo( uuid, major, rssi );
         }

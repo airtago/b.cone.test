@@ -46,5 +46,7 @@
     <string name="menu_stop">Stop</string>
     <string name="t_menu_start_log">Log</string>
     <string name="t_menu_stop_log">Log stop</string>
+    <string name="t_menu_log_on_start">Log on start</string>
+    <string name="t_menu_no_log_on_start">No log on start</string>
 </resources>
 
