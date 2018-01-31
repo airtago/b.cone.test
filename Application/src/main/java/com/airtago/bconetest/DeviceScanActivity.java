@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.bluetoothlegatt;
+package com.airtago.bconetest;
 
 import android.Manifest;
 import android.app.ActionBar;

@@ -1,9 +1,7 @@
-package com.example.android.bluetoothlegatt;
+package com.airtago.bconetest;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-
-import com.example.android.bluetoothlegatt.R;
 
 public class SettingsActivity extends PreferenceActivity {
 

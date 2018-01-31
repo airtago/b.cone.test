@@ -1,4 +1,4 @@
-package com.example.android.bluetoothlegatt;
+package com.airtago.bconetest;
 
 import android.util.Log;
 
