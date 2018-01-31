@@ -16,14 +16,13 @@
 -->
 
 <resources>
-    <string name="app_name">BluetoothLeGatt</string>
+    <string name="app_name">B.CONE Test</string>
     <string name="intro_message">
         <![CDATA[
         
-            
-            This sample demonstrates how to use the Bluetooth LE Generic Attribute Profile (GATT)
-            to transmit arbitrary data between devices.
-            
+
+                    This is a test application for b.cone devices.
+
         
         ]]>
     </string>
